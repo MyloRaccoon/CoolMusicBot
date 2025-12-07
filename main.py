@@ -65,10 +65,10 @@ async def queue(interaction: discord.Interaction):
 
 	queue = song_queue.get_guild_queue(guild_id)
 	if not queue:
-		await interaction.followup.send(f"Now playing: {song}")
+		await interaction.followup.send(f"Now playing: {playing}")
 		return
 
-	message = f"Now playing: {song}"
+	message = f"Now playing: {playing}"
 	message += "\nSongs in queue:"
 	for song in queue:
 		message += f"\n		~ {song}"
