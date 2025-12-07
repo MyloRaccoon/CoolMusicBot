@@ -34,23 +34,31 @@ async def pause(interaction: discord.Interaction):
 	voice_client = interaction.guild.voice_client
 
 	if not voice_client:
-		return await interaction.response.send_message("Nothing to pause right now...")
+		embed = discord.Embed(title="Nothing to pause right now...")
+		return await interaction.response.send_message(embed=embed, ephemeral=True)
 	
 	if not voice_client.is_paused():
 		voice_client.pause()
-		await interaction.response.send_message("Playback paused!")
+		embed = discord.Embed(title="Playback paused!")
 	else:
 		voice_client.resume()
-		await interaction.response.send_message("Playback resumed!")
+		embed = discord.Embed(title="Playback resumed!")
+
+	await interaction.response.send_message(embed=embed)
 
 
 @bot.tree.command(name="skip", description="Skip to the next song in queue")
 async def skip(interaction: discord.Interaction):
+
 	if interaction.guild.voice_client and (interaction.guild.voice_client.is_playing() or interaction.guild.voice_client.is_paused()):
 		interaction.guild.voice_client.stop()
-		await interaction.response.send_message("Skipped.")
+		embed = discord.Embed(title="Skipped.")
+		ephemeral = False
 	else:
-		await interaction.response.send_message("Not playing, anything to skip.")
+		embed = discord.Embed(title="No song currently playing, nothing to skip.")
+		ephemeral = True
+
+	await interaction.response.send_message(embed=embed, ephemeral=ephemeral)
 
 
 @bot.tree.command(name="queue", description="See the song queue")
@@ -60,20 +68,23 @@ async def queue(interaction: discord.Interaction):
 
 	playing = song_queue.get_guild_playing(guild_id)
 	if not playing:
-		await interaction.followup.send("No song playing or in queue! Use the `play` command.")
+		embed = discord.Embed(title="No song playing or in queue! Use the `play` command.")
+		await interaction.followup.send(embed=embed, ephemeral=True)
 		return
 
 	queue = song_queue.get_guild_queue(guild_id)
 	if not queue:
-		await interaction.followup.send(f"Now playing: {playing}")
+		embed = discord.Embed(title=f"Now playing", description=f"{playing}")
+		await interaction.followup.send(embed=embed)
 		return
 
-	message = f"Now playing: {playing}"
-	message += "\nSongs in queue:"
+	embed = discord.Embed()
+	embed.title = f"Now playing"
+	embed.description = f"{playing}"
 	for song in queue:
-		message += f"\n		~ {song}"
+		embed = embed.add_field(name=song.title, value=f"requested by *{song.requester}*", inline=False)
 	
-	await interaction.followup.send(message)
+	await interaction.followup.send(embed=embed)
 	
 
 @bot.tree.command(name="play", description="Play a song from youtube")
@@ -84,7 +95,7 @@ async def play(interaction: discord.Interaction, song_query: str):
 	voice_channel = interaction.user.voice.channel if not interaction.user.voice is None else None 
 
 	if voice_channel is None:
-		await interaction.followup.send("You must be in a voice channel.")
+		await interaction.followup.send(embed=discord.Embed(title="You must be in a voice channel."), ephemeral=True)
 		return
 
 	voice_client = interaction.guild.voice_client
@@ -96,7 +107,7 @@ async def play(interaction: discord.Interaction, song_query: str):
 
 	song = await search_song(song_query)
 	if song is None:
-		await interaction.followup.send(f"No result found.")
+		await interaction.followup.send(embed=discord.Embed(title=f"No result found D:"))
 		return
 	
 	song.requester = interaction.user.display_name
@@ -104,7 +115,7 @@ async def play(interaction: discord.Interaction, song_query: str):
 	guild_id = str(interaction.guild_id)
 	song_queue.add_to_queue(guild_id, song)
 
-	await interaction.followup.send(f"Added to queue: `{song.title}`")
+	await interaction.followup.send(embed=discord.Embed(title=f"Added to queue", description=f"{song.title}"))
 
 	if not voice_client.is_playing() or voice_client.is_paused():
 		channel = interaction.channel
@@ -114,7 +125,7 @@ async def play_next(voice_client: VoiceProtocol, guild_id: str, channel):
 	song = song_queue.pop(guild_id)
 
 	if not song:
-		asyncio.create_task(channel.send(f"Queue empty, disconnecting."))
+		asyncio.create_task(channel.send("Queue empty, disconnecting."))
 		await voice_client.disconnect()
 		song_queue.del_guild_queue(guild_id)
 		return
