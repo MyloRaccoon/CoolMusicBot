@@ -29,6 +29,21 @@ async def on_ready():
 	print(f"{bot.user} is ready!")
 
 
+@bot.tree.command(name="pause", description="Pause/resume the current playing song")
+async def pause(interaction: discord.Interaction):
+	voice_client = interaction.guild.voice_client
+
+	if not voice_client:
+		return await interaction.response.send_message("Nothing to pause right now...")
+	
+	if not voice_client.is_paused():
+		voice_client.pause()
+		await interaction.response.send_message("Playback paused!")
+	else:
+		voice_client.resume()
+		await interaction.response.send_message("Playback resumed!")
+
+
 @bot.tree.command(name="skip", description="Skip to the next song in queue")
 async def skip(interaction: discord.Interaction):
 	if interaction.guild.voice_client and (interaction.guild.voice_client.is_playing() or interaction.guild.voice_client.is_paused()):

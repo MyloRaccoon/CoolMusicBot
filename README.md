@@ -12,6 +12,8 @@ Get the current playing song and songs in queue
 ### Skip
 Skip the current song
 
+### Pause
+Pause/resume the current playing song
+
 ## Upcomming commands
-- pause/stop command
 - upload/play song from file
