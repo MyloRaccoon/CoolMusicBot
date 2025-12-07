@@ -4,6 +4,7 @@ A very cool Discord Music Bot because youtube takes down every one of them so I'
 ## Commands
 ### Play <querry_song>
 Play a song from youtube or adds it to queue
+    <querry_song> song name or song url
 
 ### Queue
 Get the current playing song and songs in queue
@@ -13,5 +14,4 @@ Skip the current song
 
 ## Upcomming commands
 - pause/stop command
-- play a song from url
 - upload/play song from file

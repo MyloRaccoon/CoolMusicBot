@@ -15,6 +15,9 @@ class Song:
         self.url: str = url
         self.requester: str = None
 
+    def __str__(self):
+        return f"`{self.title}` requested by **{self.requester}**"
+
 async def search_song(query: str) -> Song:
     query = "ytsearch1: " + query
     return await search_ytdlp_async(query)

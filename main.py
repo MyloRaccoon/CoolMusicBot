@@ -50,13 +50,13 @@ async def queue(interaction: discord.Interaction):
 
 	queue = song_queue.get_guild_queue(guild_id)
 	if not queue:
-		await interaction.followup.send(f"Now playing: `{playing.title}` requested by {playing.requester}")
+		await interaction.followup.send(f"Now playing: {song}")
 		return
 
-	message = f"Now playing: `{playing.title}` requested by {playing.requester}"
+	message = f"Now playing: {song}"
 	message += "\nSongs in queue:"
 	for song in queue:
-		message += f"\n		~ `{song.title}` requested by {song.requester}"
+		message += f"\n		~ {song}"
 	
 	await interaction.followup.send(message)
 	
@@ -89,7 +89,7 @@ async def play(interaction: discord.Interaction, song_query: str):
 	guild_id = str(interaction.guild_id)
 	song_queue.add_to_queue(guild_id, song)
 
-	await interaction.followup.send(f"Added to queue: **{song.title}**")
+	await interaction.followup.send(f"Added to queue: `{song.title}`")
 
 	if not voice_client.is_playing() or voice_client.is_paused():
 		channel = interaction.channel
@@ -112,7 +112,7 @@ async def play_next(voice_client: VoiceProtocol, guild_id: str, channel):
 		asyncio.run_coroutine_threadsafe(play_next(voice_client, guild_id, channel), bot.loop)
 
 	voice_client.play(source, after=after)
-	asyncio.create_task(channel.send(f"Now playing: **{song.title}**\nrequested by {song.requester}"))
+	asyncio.create_task(channel.send(f"Now playing: {song}"))
 
 
 bot.run(TOKEN)
