@@ -1,4 +1,5 @@
 from model.cursor import cur
+import discord
 
 class DiscordUser:
 
@@ -9,6 +10,13 @@ class DiscordUser:
 
     def __str__(self) -> str:
         return f"user {self.username} from guild {self.guild_id}"
+
+def user_from_interaction(user: discord.User | discord.Member, guild_id) -> DiscordUser:
+    return DiscordUser(
+        user.id,
+        user.name,
+        guild_id
+    )
 
 def user_exists(user: DiscordUser) -> bool | None:
     try:

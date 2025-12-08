@@ -4,7 +4,10 @@ import asyncio
 import discord
 from discord.ext import commands
 from discord import app_commands, VoiceProtocol
-from song import search_song, SongQueue
+from yt_requester import search_song, SongQueue
+from model.request_model import insert_request
+from model.discord_user_model import user_from_interaction
+from model.song_model import Song
 
 
 dotenv.load_dotenv()
@@ -114,6 +117,10 @@ async def play(interaction: discord.Interaction, song_query: str):
 
 	guild_id = str(interaction.guild_id)
 	song_queue.add_to_queue(guild_id, song)
+
+	user = user_from_interaction(interaction.user, interaction.guild_id)
+	if not insert_request(user, song):
+		print('error while inserting request')
 
 	await interaction.followup.send(embed=discord.Embed(title=f"Added to queue", description=f"{song.title}"))
 
