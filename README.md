@@ -17,3 +17,4 @@ Pause/resume the current playing song
 
 ## Upcomming commands
 - upload/play song from file
+- data store

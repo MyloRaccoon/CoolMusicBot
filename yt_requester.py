@@ -1,5 +1,6 @@
 import yt_dlp
 import asyncio
+from model.song_model import Song
 
 YDL_OPTIONS = {
     "format": "bestaudio[abr<=96]/bestaudio",
@@ -7,16 +8,6 @@ YDL_OPTIONS = {
     "youtube_include_dash_manifest": False,
     "youtube_include_hls_manifest": False,
 }
-
-class Song:
-
-    def __init__(self, title: str, url: str):
-        self.title: str = title
-        self.url: str = url
-        self.requester: str = None
-
-    def __str__(self):
-        return f"**{self.title}** requested by *{self.requester}*"
 
 async def search_song(query: str) -> Song:
     query = "ytsearch1: " + query
